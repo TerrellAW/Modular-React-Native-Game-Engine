@@ -1,5 +1,5 @@
 import React, { useEffect, useRef } from "react";
-import { Animated, View } from "react-native";
+import { Animated, Dimensions, View } from "react-native";
 
 export default function Physics() {
   // useRef ensures values are not reset each render
@@ -27,10 +27,10 @@ export default function Physics() {
     const nextY = positionYRef._value + velocityYRef.current;
 
     // Get floor position
-    const floorY = window.innerHeight - 150;
+    const floorY = Dimensions.get("window").height - 125; // If testing on PC change to 150, if on mobile change to 125
 
     // Check if player is grounded
-    const isGrounded = positionYRef._value > floorY - 1;
+    const isGrounded = positionYRef._value >= floorY - 1;
 
     // Floor collision (100 is floor height and 50 is player height)
     if (isGrounded) {
@@ -40,7 +40,7 @@ export default function Physics() {
       // Rest on floor
       if (Math.abs(velocityYRef.current) < 0.5) {
         velocityYRef.current = 0;
-        positionYRef.setValue(floorY - 1); // One pixel above floor
+        positionYRef.setValue(floorY); // One pixel above floor
         frame.current = requestAnimationFrame(Update); // Call next physics render, necessary due to return
         return; // Exit early when grounded, prevents falling through floor
       }

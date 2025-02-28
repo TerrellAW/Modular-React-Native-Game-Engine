@@ -1,12 +1,20 @@
 import React, { useEffect, useRef } from "react";
-import { Animated, Dimensions, View } from "react-native";
+import { Animated, Dimensions, Platform, View } from "react-native";
 
 export default function Physics() {
-  // useRef ensures values are not reset each render
+  // Platform specific adjustments
+
+  // Gap size between floor and player
+  const gapSize = Platform.select({
+    web: 5,
+    default: 1,
+  });
 
   // Screen dimensions
   const screenWidth = Dimensions.get("window").width;
   const screenHeight = Dimensions.get("window").height;
+
+  // useRef ensures values are not reset each render
 
   // Frame reference
   const frame = useRef(null);
@@ -18,15 +26,26 @@ export default function Physics() {
   let velocityXRef = useRef(0);
   let velocityYRef = useRef(0);
 
-  // Collision boxes
+  // Floor height
+  const floorHeight = 100;
+
+  // Player collision box
+  const playerBox = {
+    width: 50,
+    height: 50,
+  };
+
+  // Environment collision boxes
   const collisionBoxes = [
     {
       // Floor
-      x: 0,
-      y: screenHeight - 75, // Top of floor is 100px from bottom of screen ( 100 on PC, 75 on mobile )
-      width: screenWidth,
-      height: 100,
       type: "floor",
+      width: screenWidth,
+      height: floorHeight,
+      x: 0,
+      y:
+        screenHeight -
+        (floorHeight - (Platform.OS === "android" ? 25 : -gapSize)), // Subtract by 25 if Android and add gapSize if on PC
     },
   ];
 
@@ -41,13 +60,17 @@ export default function Physics() {
         // Bounce vertically off floor
         if (velocityYRef.current > 0) {
           velocityYRef.current = -velocityYRef.current * bounceFactor; // Reverse vertical velocity and reduce by bounce factor
-          positionYRef.setValue(box.y - 51); // Set player position to 1 pixel above floor
+          positionYRef.setValue(
+            box.y - (playerBox.height + gapSize) // 1 pixel above floor by default
+          ); // Set player position above floor
         }
 
         // Settle if velocity is low enough
         if (Math.abs(velocityYRef.current) < 0.5) {
           velocityYRef.current = 0;
-          positionYRef.setValue(box.y - 51); // Set player position to 1 pixel above floor
+          positionYRef.setValue(
+            box.y - (playerBox.height + gapSize) // 1 pixel above floor by default
+          ); // Set player position above floor
         }
         break;
 
@@ -55,7 +78,9 @@ export default function Physics() {
         // Bounce vertically off ceiling
         if (velocityYRef.current < 0) {
           velocityYRef.current = -velocityYRef.current * bounceFactor; // Reverse vertical velocity and reduce by bounce factor
-          positionYRef.setValue(box.y + 51); // Set player position to 1 pixel below ceiling
+          positionYRef.setValue(
+            box.y + (playerBox.height + gapSize) // 1 pixel below ceiling by default
+          ); // Set player position below ceiling
         }
 
       //case "wall":
@@ -75,21 +100,20 @@ export default function Physics() {
 
     // Check for collisions
     const checkCollisions = () => {
-      // Player collision box
-      const playerBox = {
+      // Get current player position
+      const currentPlayerBox = {
+        ...playerBox,
         x: positionXRef._value,
         y: positionYRef._value,
-        width: 50,
-        height: 50,
       };
 
       collisionBoxes.forEach((box) => {
         // Check intersecting playerBox and collisionBox
         if (
-          playerBox.x < box.x + box.width &&
-          playerBox.x + playerBox.width > box.x &&
-          playerBox.y < box.y + box.height &&
-          playerBox.y + playerBox.height > box.y
+          currentPlayerBox.x < box.x + box.width &&
+          currentPlayerBox.x + currentPlayerBox.width > box.x &&
+          currentPlayerBox.y < box.y + box.height &&
+          currentPlayerBox.y + playerBox.height > box.y
         ) {
           // Collision detected
           console.log("Collision detected!");
@@ -125,7 +149,6 @@ export default function Physics() {
     <View
       style={{
         flex: 1,
-        position: "relative",
         width: "100%",
         height: "100%",
         backgroundColor: "#202121",

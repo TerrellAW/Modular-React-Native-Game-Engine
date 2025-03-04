@@ -1,15 +1,15 @@
 import { SafeAreaView } from "react-native";
 
-import Physics from "./components/Physics";
+import Engine from "./engine/Engine";
 
 export default function App() {
   return (
     <SafeAreaView
       style={{
-          flex: 1,
-        }}
-    >     
-      <Physics />
+        flex: 1,
+      }}
+    >
+      <Engine />
     </SafeAreaView>
   );
 }

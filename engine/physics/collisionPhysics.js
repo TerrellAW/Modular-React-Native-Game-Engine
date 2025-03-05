@@ -31,14 +31,14 @@ export const collisionBoxes = [
     width: screenWidth,
     height: 1,
     x: 0,
-    y: 0,
+    y: Platform.OS === "android" ? 25 : -gapSize, // Add by 25 if Android and subtract gapSize if on PC
   },
   {
     // Left wall
     type: "wall",
     width: 1,
     height: screenHeight,
-    x: 0,
+    x: 1, // I want to use gapSize but walls are stupid
     y: 0,
   },
   {
@@ -46,7 +46,7 @@ export const collisionBoxes = [
     type: "wall",
     width: 1,
     height: screenHeight,
-    x: screenWidth - 1,
+    x: screenWidth - 1, // I want to use gapSize but walls are stupid
     y: 0,
   },
 ];
@@ -93,18 +93,14 @@ export const handleCollision = (
       }
       break;
 
-    case "wall":
+    case "wall": // It just oscillates, i don't know why
       // Bounce horizontally off wall
       if (velocityXRef.current > 0) {
-        velocityXRef.current = -velocityXRef.current * bounceFactor; // Reverse horizontal velocity and reduce by bounce factor
-        positionXRef.setValue(
-          box.x - (playerBox.width + gapSize) // 1 pixel to the left of wall by default
-        ); // Set player position to the left of wall
+        positionXRef.setValue(box.x - playerBox.width + 5); // Set player position to the left of the wall
+        velocityXRef.current = -velocityXRef.current; // Reverse horizontal velocity and reduce by bounce factor
       } else if (velocityXRef.current < 0) {
-        velocityXRef.current = -velocityXRef.current * bounceFactor; // Reverse horizontal velocity and reduce by bounce factor
-        positionXRef.setValue(
-          box.x + (playerBox.width + gapSize) // 1 pixel to the right of wall by default
-        ); // Set player position to the right of wall
+        positionXRef.setValue(box.x + playerBox.width + 5); // Set player position to the right of the wall
+        velocityXRef.current = -velocityXRef.current; // Reverse horizontal velocity and reduce by bounce factor
       }
       break;
   }

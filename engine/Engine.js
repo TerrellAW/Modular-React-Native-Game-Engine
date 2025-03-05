@@ -57,8 +57,6 @@ export default function Engine() {
         y: positionYRef._value + gapSize,
       };
 
-      let hasCollision = false;
-
       collisionBoxes.forEach((box) => {
         // Check intersecting playerBox and collisionBox
         if (
@@ -68,7 +66,6 @@ export default function Engine() {
           currentPlayerBox.y + playerBox.height > box.y
         ) {
           // Collision detected
-          hasCollision = true;
           handleCollision(
             box,
             velocityXRef,
@@ -102,12 +99,6 @@ export default function Engine() {
               break;
           }
         }
-
-        // Only apply gravity if no collision at all
-        // if (!hasCollision) {
-        //   // No collision
-        //   velocityYRef.current += gravity;
-        // }
       });
     };
 

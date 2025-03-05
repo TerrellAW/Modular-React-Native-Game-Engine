@@ -36,17 +36,17 @@ export const collisionBoxes = [
   {
     // Left wall
     type: "leftWall",
-    width: 5,
+    width: 1,
     height: screenHeight,
-    x: 5, // I want to use gapSize but walls are stupid
+    x: 0, // I want to use gapSize but walls are stupid
     y: 0,
   },
   {
     // Right wall
     type: "rightWall",
-    width: 5,
+    width: 1,
     height: screenHeight,
-    x: screenWidth - 5, // I want to use gapSize but walls are stupid
+    x: screenWidth - 1, // I want to use gapSize but walls are stupid
     y: 0,
   },
 ];
@@ -68,18 +68,12 @@ export const handleCollision = (
     case "floor":
       // Bounce vertically off floor
       if (velocityYRef.current > 0) {
-        velocityYRef.current = -velocityYRef.current * bounceFactor; // Reverse vertical velocity and reduce by bounce factor
-        // positionYRef.setValue(
-        //   box.y - (playerBox.height + gapSize) // 1 pixel above floor by default
-        // ); // Set player position above floor
-      }
-
-      // Settle if velocity is low enough
-      if (Math.abs(velocityYRef.current) < 0.5) {
-        velocityYRef.current = 0;
-        // positionYRef.setValue(
-        //   box.y - (playerBox.height + gapSize) // 1 pixel above floor by default
-        // ); // Set player position above floor
+        if (Math.abs(velocityYRef.current) < 1) {
+          velocityYRef.current = 0;
+          positionYRef.setValue(box.y - playerBox.height - gapSize);
+        } else {
+          velocityYRef.current = -velocityYRef.current * bounceFactor; // Reverse vertical velocity and reduce by bounce factor
+        }
       }
       break;
 
@@ -87,9 +81,6 @@ export const handleCollision = (
       // Bounce vertically off ceiling
       if (velocityYRef.current < 0) {
         velocityYRef.current = -velocityYRef.current * bounceFactor; // Reverse vertical velocity and reduce by bounce factor
-        // positionYRef.setValue(
-        //   box.y + (playerBox.height + gapSize) // 1 pixel below ceiling by default
-        // ); // Set player position below ceiling
       }
       break;
 

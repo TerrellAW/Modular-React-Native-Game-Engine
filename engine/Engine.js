@@ -30,6 +30,9 @@ export default function Engine() {
   const Update = () => {
     // Update physics
 
+    // Applly gravity
+    velocityYRef.current += gravity;
+
     // Log velocity
     console.log(
       "Update velocities:",
@@ -46,8 +49,8 @@ export default function Engine() {
       // Get current player position
       const currentPlayerBox = {
         ...playerBox,
-        x: positionXRef._value,
-        y: positionYRef._value,
+        x: positionXRef._value + gapSize,
+        y: positionYRef._value + gapSize,
       };
 
       let hasCollision = false;
@@ -80,12 +83,12 @@ export default function Engine() {
               break;
             case "ceiling":
               if (nextY < box.y + (playerBox.height + gapSize)) {
-                nextY = box.y + (playerBox.height + gapSize);
+                nextY = box.y + box.height;
               }
               break;
             case "leftWall":
               if (nextX < box.x + (playerBox.width + gapSize)) {
-                nextX = box.x + (playerBox.width + gapSize);
+                nextX = box.x + box.width;
               }
               break;
             case "rightWall":
@@ -97,10 +100,10 @@ export default function Engine() {
         }
 
         // Only apply gravity if no collision at all
-        if (!hasCollision) {
-          // No collision
-          velocityYRef.current += gravity;
-        }
+        // if (!hasCollision) {
+        //   // No collision
+        //   velocityYRef.current += gravity;
+        // }
       });
     };
 

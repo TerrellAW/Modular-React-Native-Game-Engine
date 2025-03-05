@@ -1,7 +1,8 @@
 import React, { useEffect, useRef } from "react";
-import { Animated, View } from "react-native";
+import { Animated, View, Platform } from "react-native";
 
 // Configuration files
+import gapConfig from "./config/gapConfig";
 import playerConfig from "./config/playerConfig";
 import { collisionBoxes, handleCollision } from "./physics/collisionPhysics";
 import { handleTouch } from "./input/input";
@@ -19,6 +20,9 @@ export default function Engine() {
   let velocityXRef = useRef(0);
   let velocityYRef = useRef(0);
 
+  // Platform specific gap size
+  const gapSize = Platform.OS === "web" ? gapConfig.web : gapConfig.default;
+
   // Player collision box
   const playerBox = playerConfig;
 
@@ -34,8 +38,8 @@ export default function Engine() {
     );
 
     // Get next position
-    const nextY = positionYRef._value + velocityYRef.current;
-    const nextX = positionXRef._value + velocityXRef.current;
+    let nextY = positionYRef._value + velocityYRef.current;
+    let nextX = positionXRef._value + velocityXRef.current;
 
     // Check for collisions
     const checkCollisions = () => {
@@ -66,6 +70,30 @@ export default function Engine() {
             positionYRef,
             playerBox
           );
+
+          // Enforce boundaries
+          switch (box.type) {
+            case "floor":
+              if (nextY > box.y - (playerBox.height + gapSize)) {
+                nextY = box.y - (playerBox.height + gapSize);
+              }
+              break;
+            case "ceiling":
+              if (nextY < box.y + (playerBox.height + gapSize)) {
+                nextY = box.y + (playerBox.height + gapSize);
+              }
+              break;
+            case "leftWall":
+              if (nextX < box.x + (playerBox.width + gapSize)) {
+                nextX = box.x + (playerBox.width + gapSize);
+              }
+              break;
+            case "rightWall":
+              if (nextX > box.x - (playerBox.width + gapSize)) {
+                nextX = box.x - (playerBox.width + gapSize);
+              }
+              break;
+          }
         }
 
         // Only apply gravity if no collision at all

@@ -35,7 +35,7 @@ export const collisionBoxes = [
   },
   {
     // Left wall
-    type: "wall",
+    type: "leftWall",
     width: 5,
     height: screenHeight,
     x: 5, // I want to use gapSize but walls are stupid
@@ -43,7 +43,7 @@ export const collisionBoxes = [
   },
   {
     // Right wall
-    type: "wall",
+    type: "rightWall",
     width: 5,
     height: screenHeight,
     x: screenWidth - 5, // I want to use gapSize but walls are stupid
@@ -69,17 +69,17 @@ export const handleCollision = (
       // Bounce vertically off floor
       if (velocityYRef.current > 0) {
         velocityYRef.current = -velocityYRef.current * bounceFactor; // Reverse vertical velocity and reduce by bounce factor
-        positionYRef.setValue(
-          box.y - (playerBox.height + gapSize) // 1 pixel above floor by default
-        ); // Set player position above floor
+        // positionYRef.setValue(
+        //   box.y - (playerBox.height + gapSize) // 1 pixel above floor by default
+        // ); // Set player position above floor
       }
 
       // Settle if velocity is low enough
       if (Math.abs(velocityYRef.current) < 0.5) {
         velocityYRef.current = 0;
-        positionYRef.setValue(
-          box.y - (playerBox.height + gapSize) // 1 pixel above floor by default
-        ); // Set player position above floor
+        // positionYRef.setValue(
+        //   box.y - (playerBox.height + gapSize) // 1 pixel above floor by default
+        // ); // Set player position above floor
       }
       break;
 
@@ -87,22 +87,21 @@ export const handleCollision = (
       // Bounce vertically off ceiling
       if (velocityYRef.current < 0) {
         velocityYRef.current = -velocityYRef.current * bounceFactor; // Reverse vertical velocity and reduce by bounce factor
-        positionYRef.setValue(
-          box.y + (playerBox.height + gapSize) // 1 pixel below ceiling by default
-        ); // Set player position below ceiling
+        // positionYRef.setValue(
+        //   box.y + (playerBox.height + gapSize) // 1 pixel below ceiling by default
+        // ); // Set player position below ceiling
       }
       break;
 
-    case "wall": // It just oscillates, i don't know why
-      // Bounce horizontally off wall
-      if (Math.abs(velocityXRef.current > 0.5)) {
-        positionXRef.setValue(box.x + playerBox.width + 5); // Set player position to the left of the wall
-        velocityXRef.current = -velocityXRef.current; // Reverse horizontal velocity and reduce by bounce factor
-      } else if (Math.abs(velocityXRef.current < -0.5)) {
-        positionXRef.setValue(box.x - playerBox.width - 5); // Set player position to the right of the wall
-        velocityXRef.current = -velocityXRef.current; // Reverse horizontal velocity and reduce by bounce factor
-      } else {
-        velocityXRef.current = 0;
+    case "leftWall":
+      if (velocityXRef.current < 0) {
+        velocityXRef.current = -velocityXRef.current;
+      }
+      break;
+
+    case "rightWall":
+      if (velocityXRef.current > 0) {
+        velocityXRef.current = -velocityXRef.current;
       }
       break;
   }

@@ -4,6 +4,7 @@ import { Animated, View } from "react-native";
 // Configuration files
 import playerConfig from "./config/playerConfig";
 import { collisionBoxes, handleCollision } from "./physics/collisionPhysics";
+import { handleTouch } from "./input/input";
 
 export default function Engine() {
   // useRef ensures values are not reset each render
@@ -13,8 +14,8 @@ export default function Engine() {
 
   // Physics variables
   const gravity = 0.2;
-  const positionXRef = useRef(new Animated.Value(0)).current;
-  const positionYRef = useRef(new Animated.Value(0)).current;
+  const positionXRef = useRef(new Animated.Value(50)).current;
+  const positionYRef = useRef(new Animated.Value(50)).current;
   let velocityXRef = useRef(0);
   let velocityYRef = useRef(0);
 
@@ -26,10 +27,15 @@ export default function Engine() {
     // Update physics
 
     // Log velocity
-    console.log(velocityYRef.current);
+    console.log(
+      "Update velocities:",
+      velocityXRef.current,
+      velocityYRef.current
+    );
 
     // Get next position
     const nextY = positionYRef._value + velocityYRef.current;
+    const nextX = positionXRef._value + velocityXRef.current;
 
     // Check for collisions
     const checkCollisions = () => {
@@ -74,6 +80,7 @@ export default function Engine() {
 
     // Set next position
     positionYRef.setValue(nextY);
+    positionXRef.setValue(nextX);
 
     // Ensure frame-based updates
     frame.current = requestAnimationFrame(Update);
@@ -98,6 +105,28 @@ export default function Engine() {
         height: "100%",
         backgroundColor: "#202121",
       }}
+      onStartShouldSetResponder={() => true}
+      onMoveShouldSetResponder={() => true}
+      onResponderGrant={(event) =>
+        handleTouch(
+          event,
+          positionXRef,
+          positionYRef,
+          velocityXRef,
+          velocityYRef,
+          playerBox
+        )
+      }
+      onResponderMove={(event) =>
+        handleTouch(
+          event,
+          positionXRef,
+          positionYRef,
+          velocityXRef,
+          velocityYRef,
+          playerBox
+        )
+      }
     >
       {/* Player */}
       <Animated.View

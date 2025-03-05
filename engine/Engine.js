@@ -15,6 +15,7 @@ export default function Engine() {
 
   // Physics variables
   const gravity = 0.2;
+  const friction = 0.98; // 2% speed reduction per frame
   const positionXRef = useRef(new Animated.Value(50)).current;
   const positionYRef = useRef(new Animated.Value(50)).current;
   let velocityXRef = useRef(0);
@@ -30,7 +31,10 @@ export default function Engine() {
   const Update = () => {
     // Update physics
 
-    // Applly gravity
+    // Apply friction
+    velocityXRef.current *= friction;
+
+    // Apply gravity
     velocityYRef.current += gravity;
 
     // Log velocity

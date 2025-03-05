@@ -25,10 +25,41 @@ export const collisionBoxes = [
       screenHeight -
       (floorHeight - (Platform.OS === "android" ? 25 : -gapSize)), // Subtract by 25 if Android and add gapSize if on PC
   },
+  {
+    // Ceiling
+    type: "ceiling",
+    width: screenWidth,
+    height: 1,
+    x: 0,
+    y: 0,
+  },
+  {
+    // Left wall
+    type: "wall",
+    width: 1,
+    height: screenHeight,
+    x: 0,
+    y: 0,
+  },
+  {
+    // Right wall
+    type: "wall",
+    width: 1,
+    height: screenHeight,
+    x: screenWidth - 1,
+    y: 0,
+  },
 ];
 
 // Collision handler
-export const handleCollision = (box, velocityYRef, positionYRef, playerBox) => {
+export const handleCollision = (
+  box,
+  velocityXRef,
+  velocityYRef,
+  positionXRef,
+  positionYRef,
+  playerBox
+) => {
   // Bounce multiplier (0.2 means 20% of velocity goes into bounce)
   const bounceFactor = 0.2;
 
@@ -60,8 +91,21 @@ export const handleCollision = (box, velocityYRef, positionYRef, playerBox) => {
           box.y + (playerBox.height + gapSize) // 1 pixel below ceiling by default
         ); // Set player position below ceiling
       }
+      break;
 
-    //case "wall":
-    // Bounce horizontally off wall
+    case "wall":
+      // Bounce horizontally off wall
+      if (velocityXRef.current > 0) {
+        velocityXRef.current = -velocityXRef.current * bounceFactor; // Reverse horizontal velocity and reduce by bounce factor
+        positionXRef.setValue(
+          box.x - (playerBox.width + gapSize) // 1 pixel to the left of wall by default
+        ); // Set player position to the left of wall
+      } else if (velocityXRef.current < 0) {
+        velocityXRef.current = -velocityXRef.current * bounceFactor; // Reverse horizontal velocity and reduce by bounce factor
+        positionXRef.setValue(
+          box.x + (playerBox.width + gapSize) // 1 pixel to the right of wall by default
+        ); // Set player position to the right of wall
+      }
+      break;
   }
 };

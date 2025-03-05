@@ -36,17 +36,17 @@ export const collisionBoxes = [
   {
     // Left wall
     type: "wall",
-    width: 1,
+    width: 5,
     height: screenHeight,
-    x: 1, // I want to use gapSize but walls are stupid
+    x: 5, // I want to use gapSize but walls are stupid
     y: 0,
   },
   {
     // Right wall
     type: "wall",
-    width: 1,
+    width: 5,
     height: screenHeight,
-    x: screenWidth - 1, // I want to use gapSize but walls are stupid
+    x: screenWidth - 5, // I want to use gapSize but walls are stupid
     y: 0,
   },
 ];
@@ -95,12 +95,14 @@ export const handleCollision = (
 
     case "wall": // It just oscillates, i don't know why
       // Bounce horizontally off wall
-      if (velocityXRef.current > 0) {
-        positionXRef.setValue(box.x - playerBox.width + 5); // Set player position to the left of the wall
+      if (Math.abs(velocityXRef.current > 0.5)) {
+        positionXRef.setValue(box.x + playerBox.width + 5); // Set player position to the left of the wall
         velocityXRef.current = -velocityXRef.current; // Reverse horizontal velocity and reduce by bounce factor
-      } else if (velocityXRef.current < 0) {
-        positionXRef.setValue(box.x + playerBox.width + 5); // Set player position to the right of the wall
+      } else if (Math.abs(velocityXRef.current < -0.5)) {
+        positionXRef.setValue(box.x - playerBox.width - 5); // Set player position to the right of the wall
         velocityXRef.current = -velocityXRef.current; // Reverse horizontal velocity and reduce by bounce factor
+      } else {
+        velocityXRef.current = 0;
       }
       break;
   }

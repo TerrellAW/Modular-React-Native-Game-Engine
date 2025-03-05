@@ -1,5 +1,5 @@
 import React, { useEffect, useRef } from "react";
-import { Animated, Platform, View } from "react-native";
+import { Animated, View } from "react-native";
 
 // Configuration files
 import playerConfig from "./config/playerConfig";
@@ -40,6 +40,8 @@ export default function Engine() {
         y: positionYRef._value,
       };
 
+      let hasCollision = false;
+
       collisionBoxes.forEach((box) => {
         // Check intersecting playerBox and collisionBox
         if (
@@ -49,9 +51,19 @@ export default function Engine() {
           currentPlayerBox.y + playerBox.height > box.y
         ) {
           // Collision detected
-          console.log("Collision detected!");
-          handleCollision(box, velocityYRef, positionYRef, playerBox);
-        } else {
+          hasCollision = true;
+          handleCollision(
+            box,
+            velocityXRef,
+            velocityYRef,
+            positionXRef,
+            positionYRef,
+            playerBox
+          );
+        }
+
+        // Only apply gravity if no collision at all
+        if (!hasCollision) {
           // No collision
           velocityYRef.current += gravity;
         }

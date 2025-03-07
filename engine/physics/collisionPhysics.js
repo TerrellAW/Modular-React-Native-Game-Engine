@@ -7,11 +7,11 @@ import gapConfig from "../config/gapConfig";
 const gapSize = Platform.OS === "web" ? gapConfig.web : gapConfig.default;
 
 // Screen dimensions
-const screenWidth = Dimensions.get("window").width;
-const screenHeight = Dimensions.get("window").height;
+export const screenWidth = Dimensions.get("window").width;
+export const screenHeight = Dimensions.get("window").height;
 
 // Floor height
-const floorHeight = 100;
+export const floorHeight = 100;
 
 // Environment collision boxes
 export const collisionBoxes = [

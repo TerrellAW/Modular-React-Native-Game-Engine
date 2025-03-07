@@ -5,7 +5,13 @@ import { Animated, View, Platform } from "react-native";
 import gapConfig from "./config/gapConfig";
 import physicsConfig from "./config/physicsConfig";
 import playerConfig from "./config/playerConfig";
-import { collisionBoxes, handleCollision } from "./physics/collisionPhysics";
+import {
+  collisionBoxes,
+  handleCollision,
+  floorHeight,
+  screenWidth,
+  screenHeight,
+} from "./physics/collisionPhysics";
 import { handleTouch } from "./input/input";
 
 export default function Engine() {
@@ -161,8 +167,8 @@ export default function Engine() {
       <Animated.View
         style={{
           position: "absolute",
-          width: 50,
-          height: 50,
+          width: playerBox.width,
+          height: playerBox.height,
           backgroundColor: "#f0f0f0",
           transform: [
             { translateX: positionXRef },
@@ -175,8 +181,8 @@ export default function Engine() {
         style={{
           position: "absolute",
           bottom: 0,
-          width: "100%",
-          height: 100,
+          width: screenWidth,
+          height: floorHeight,
           backgroundColor: "#f0f0f0",
         }}
       />

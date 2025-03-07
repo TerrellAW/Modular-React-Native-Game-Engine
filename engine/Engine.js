@@ -3,6 +3,7 @@ import { Animated, View, Platform } from "react-native";
 
 // Configuration files
 import gapConfig from "./config/gapConfig";
+import physicsConfig from "./config/physicsConfig";
 import playerConfig from "./config/playerConfig";
 import { collisionBoxes, handleCollision } from "./physics/collisionPhysics";
 import { handleTouch } from "./input/input";
@@ -14,18 +15,20 @@ export default function Engine() {
   const frame = useRef(null);
 
   // Physics variables
-  const gravity = 0.2;
-  const friction = 0.98; // 2% speed reduction per frame
-  const positionXRef = useRef(new Animated.Value(50)).current;
-  const positionYRef = useRef(new Animated.Value(50)).current;
-  let velocityXRef = useRef(0);
-  let velocityYRef = useRef(0);
+  const gravity = physicsConfig.gravity; // Default is 0.2
+  const friction = physicsConfig.friction; // Default is 0.98, a 2% speed reduction per frame
 
   // Platform specific gap size
   const gapSize = Platform.OS === "web" ? gapConfig.web : gapConfig.default;
 
   // Player collision box
   const playerBox = playerConfig;
+
+  // Player position and velocity
+  const positionXRef = useRef(new Animated.Value(playerBox.x)).current;
+  const positionYRef = useRef(new Animated.Value(playerBox.y)).current;
+  let velocityXRef = useRef(playerBox.velocityX);
+  let velocityYRef = useRef(playerBox.velocityY);
 
   // Create recursive update loop for physics
   const Update = () => {

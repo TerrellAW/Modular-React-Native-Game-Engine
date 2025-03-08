@@ -79,7 +79,6 @@ export default function Engine() {
             box,
             velocityXRef,
             velocityYRef,
-            positionXRef,
             positionYRef,
             playerBox
           );

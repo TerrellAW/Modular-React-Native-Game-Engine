@@ -2,6 +2,7 @@ import { Dimensions, Platform } from "react-native";
 
 // Configuration files
 import gapConfig from "../config/gapConfig";
+import physicsConfig from "../config/physicsConfig";
 
 // Gap size between floor and player (Platform specific)
 const gapSize = Platform.OS === "web" ? gapConfig.web : gapConfig.default;
@@ -80,12 +81,11 @@ export const handleCollision = (
   box,
   velocityXRef,
   velocityYRef,
-  positionXRef,
   positionYRef,
   playerBox
 ) => {
-  // Bounce multiplier (0.2 means 20% of velocity goes into bounce)
-  const bounceFactor = 0.2;
+  // Bounce multiplier (Default: 0.2, means 20% of velocity goes into bounce)
+  const bounceFactor = physicsConfig.bounceFactor;
 
   switch (box.type) {
     // Calculate bounce based on collision type
@@ -98,6 +98,8 @@ export const handleCollision = (
         } else {
           velocityYRef.current = -velocityYRef.current * bounceFactor; // Reverse vertical velocity and reduce by bounce factor
         }
+        // Slipperiness
+        velocityXRef.current *= 0.9; // The closer to 1, the more slippery
       }
       break;
 

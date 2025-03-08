@@ -49,6 +49,30 @@ export const collisionBoxes = [
     x: screenWidth - 1, // I want to use gapSize but walls are stupid
     y: 0,
   },
+  {
+    // Platform top
+    type: "floor",
+    width: screenWidth / 4 + 2, // 2 pixel off the platform
+    height: 1,
+    x: screenWidth - screenWidth / 4 - 2, // 2 pixel off the platform
+    y: screenHeight - 400,
+  },
+  {
+    // Platform bottom
+    type: "ceiling",
+    width: screenWidth / 4 + 2, // 2 pixel off the platform
+    height: 1,
+    x: screenWidth - screenWidth / 4 - 2, // 2 pixel off the platform
+    y: screenHeight - 400 + floorHeight / 4 + 5,
+  },
+  {
+    // Platform side
+    type: "rightWall",
+    width: 1,
+    height: floorHeight / 4 - 6, // 6 pixels smaller than actual height to prevent clipping
+    x: screenWidth - screenWidth / 4 + 1, // 1 pixel off the platform,
+    y: screenHeight - 400 + 3, // Move down 3 pixels from top to center it
+  },
 ];
 
 // Collision handler

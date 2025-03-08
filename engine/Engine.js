@@ -180,9 +180,21 @@ export default function Engine() {
       <View
         style={{
           position: "absolute",
-          bottom: 0,
+          bottom: 0, // Set position from bottom of screen
+          left: collisionBoxes[0].x, // Set position from left of screen
           width: screenWidth,
           height: floorHeight,
+          backgroundColor: "#f0f0f0",
+        }}
+      />
+      {/* Platform */}
+      <View
+        style={{
+          position: "absolute",
+          bottom: 400, // Set position from bottom of screen
+          left: collisionBoxes[4].x, // Set position from left of screen
+          width: screenWidth / 4,
+          height: floorHeight / 4,
           backgroundColor: "#f0f0f0",
         }}
       />

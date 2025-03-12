@@ -17,8 +17,7 @@ export const floorHeight = 100;
 // Environment collision boxes
 export const collisionBoxes = [
   {
-    // Floor
-    type: "floor",
+    name: "floor",
     width: screenWidth,
     height: floorHeight,
     x: 0,
@@ -27,53 +26,33 @@ export const collisionBoxes = [
       (floorHeight - (Platform.OS === "android" ? 25 : -gapSize)), // Subtract by 25 if Android and add gapSize if on PC
   },
   {
-    // Ceiling
-    type: "ceiling",
+    name: "screenTop",
     width: screenWidth,
     height: 1,
     x: 0,
     y: Platform.OS === "android" ? 25 : -gapSize, // Add by 25 if Android and subtract gapSize if on PC
   },
   {
-    // Left wall
-    type: "leftWall",
+    name: "leftScreenEdge",
     width: 1,
     height: screenHeight,
     x: 0, // I want to use gapSize but walls are stupid
     y: 0,
   },
   {
-    // Right wall
-    type: "rightWall",
+    name: "rightScreenEdge",
     width: 1,
     height: screenHeight,
     x: screenWidth - 1, // I want to use gapSize but walls are stupid
     y: 0,
   },
   {
-    // Platform top
-    type: "floor",
+    name: "platform1",
     width: screenWidth / 4 + 2, // 2 pixel off the platform
-    height: 1,
+    height: floorHeight / 4, // Full height of platform
     x: screenWidth - screenWidth / 4 - 2, // 2 pixel off the platform
     y: screenHeight - 400,
   },
-  {
-    // Platform bottom
-    type: "ceiling",
-    width: screenWidth / 4 + 2, // 2 pixel off the platform
-    height: 1,
-    x: screenWidth - screenWidth / 4 - 2, // 2 pixel off the platform
-    y: screenHeight - 400 + floorHeight / 4 + 5,
-  },
-  // {
-  //   // Platform side
-  //   type: "rightWall",
-  //   width: 1,
-  //   height: floorHeight / 4 - 6, // 6 pixels smaller than actual height to prevent clipping
-  //   x: screenWidth - screenWidth / 4 + 1, // 1 pixel off the platform,
-  //   y: screenHeight - 400 + 3, // Move down 3 pixels from top to center it
-  // },
 ];
 
 // Collision handler
@@ -81,45 +60,44 @@ export const handleCollision = (
   box,
   velocityXRef,
   velocityYRef,
+  positionXRef,
   positionYRef,
   playerBox
 ) => {
   // Bounce multiplier (Default: 0.2, means 20% of velocity goes into bounce)
   const bounceFactor = physicsConfig.bounceFactor;
 
-  switch (box.type) {
-    // Calculate bounce based on collision type
-    case "floor":
-      // Bounce vertically off floor
-      if (velocityYRef.current > 0) {
-        if (Math.abs(velocityYRef.current) < 1) {
-          velocityYRef.current = 0;
-          positionYRef.setValue(box.y - playerBox.height - gapSize);
-        } else {
-          velocityYRef.current = -velocityYRef.current * bounceFactor; // Reverse vertical velocity and reduce by bounce factor
-        }
-        // Slipperiness
-        velocityXRef.current *= 0.9; // The closer to 1, the more slippery
-      }
-      break;
+  // Calculate relative positions and directions
+  const playerBottom = positionYRef._value + playerBox.height;
+  const playerRight = positionXRef._value + playerBox.width;
+  const boxBottom = box.y + box.height;
+  const boxRight = box.x + box.width;
 
-    case "ceiling":
-      // Bounce vertically off ceiling
-      if (velocityYRef.current < 0) {
-        velocityYRef.current = -velocityYRef.current * bounceFactor; // Reverse vertical velocity and reduce by bounce factor
-      }
-      break;
+  // Check collision direction (simplified)
+  if (playerBottom > box.y - gapSize && velocityYRef.current > 0) {
+    // Collision from above (floor-like behavior)
+    if (Math.abs(velocityYRef.current) < 1) {
+      velocityYRef.current = 0;
+      positionYRef.setValue(box.y - playerBox.height - gapSize);
+    } else {
+      velocityYRef.current *= -bounceFactor; // Reverse and reduce vertical velocity
+    }
+    // Slipperiness (reduce horizontal speed)
+    velocityXRef.current *= 0.9;
+  }
 
-    case "leftWall":
-      if (velocityXRef.current < 0) {
-        velocityXRef.current = -velocityXRef.current;
-      }
-      break;
+  if (playerBottom < boxBottom + gapSize && velocityYRef.current < 0) {
+    // Collision from below (ceiling-like behavior)
+    velocityYRef.current *= -bounceFactor; // Reverse and reduce vertical velocity
+  }
 
-    case "rightWall":
-      if (velocityXRef.current > 0) {
-        velocityXRef.current = -velocityXRef.current;
-      }
-      break;
+  if (playerRight > box.x - gapSize && velocityXRef.current > 0) {
+    // Collision from left (right wall-like behavior)
+    velocityXRef.current *= -1; // Reverse horizontal velocity
+  }
+
+  if (positionXRef._value < boxRight + gapSize && velocityXRef.current < 0) {
+    // Collision from right (left wall-like behavior)
+    velocityXRef.current *= -1; // Reverse horizontal velocity
   }
 };

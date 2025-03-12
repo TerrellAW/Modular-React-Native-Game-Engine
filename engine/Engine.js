@@ -79,32 +79,42 @@ export default function Engine() {
             box,
             velocityXRef,
             velocityYRef,
+            positionXRef,
             positionYRef,
             playerBox
           );
 
           // Enforce boundaries
-          switch (box.type) {
-            case "floor":
-              if (nextY > box.y - (playerBox.height + gapSize)) {
-                nextY = box.y - (playerBox.height + gapSize);
-              }
-              break;
-            case "ceiling":
-              if (nextY < box.y + (playerBox.height + gapSize)) {
-                nextY = box.y + box.height;
-              }
-              break;
-            case "leftWall":
-              if (nextX < box.x + (playerBox.width + gapSize)) {
-                nextX = box.x + box.width;
-              }
-              break;
-            case "rightWall":
-              if (nextX > box.x - (playerBox.width + gapSize)) {
-                nextX = box.x - (playerBox.width + gapSize);
-              }
-              break;
+          // Enforce boundaries based on relative positions
+          const playerBottom = positionYRef._value + playerBox.height;
+          const playerRight = positionXRef._value + playerBox.width;
+          const boxBottom = box.y + box.height;
+          const boxRight = box.x + box.width;
+
+          if (playerBottom > box.y - gapSize && velocityYRef.current > 0) {
+            // Collision from above (floor-like behavior)
+            nextY = box.y - playerBox.height - gapSize;
+          }
+
+          if (
+            positionYRef._value < boxBottom + gapSize &&
+            velocityYRef.current < 0
+          ) {
+            // Collision from below (ceiling-like behavior)
+            nextY = boxBottom + gapSize;
+          }
+
+          if (playerRight > box.x - gapSize && velocityXRef.current > 0) {
+            // Collision from left (right wall-like behavior)
+            nextX = box.x - playerBox.width - gapSize;
+          }
+
+          if (
+            positionXRef._value < boxRight + gapSize &&
+            velocityXRef.current < 0
+          ) {
+            // Collision from right (left wall-like behavior)
+            nextX = boxRight + gapSize;
           }
         }
       });
